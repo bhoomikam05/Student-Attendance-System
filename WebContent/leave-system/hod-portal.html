@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HOD Portal — EduLeave</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --primary:#6c63ff; --primary-dark:#5a52d5;
+      --bg:#0f0f1a; --card:#1e1e35;
+      --text:#e8e8f0; --text-muted:#9090b0; --border:#2a2a45;
+      --pending:#f7c948; --approved:#43e97b; --rejected:#ff6584;
+      --green:#43e97b; --orange:#f7971e;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+
+    .bg-orbs { position:fixed; inset:0; pointer-events:none; z-index:0; }
+    .orb { position:absolute; border-radius:50%; filter:blur(80px); opacity:0.1; animation:float 8s ease-in-out infinite; }
+    .orb1 { width:500px; height:500px; background:var(--primary); top:-100px; left:-80px; }
+    .orb2 { width:400px; height:400px; background:#ff6584; bottom:-80px; right:-80px; animation-delay:4s; }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-20px)} }
+
+    /* LOGIN */
+    #loginScreen { position:relative; z-index:5; min-height:100vh; display:flex; flex-direction:column; }
+    header {
+      padding:16px 32px; display:flex; align-items:center; justify-content:space-between;
+      border-bottom:1px solid var(--border); background:rgba(15,15,26,0.8); backdrop-filter:blur(12px);
+    }
+    .logo { font-size:1.2rem; font-weight:800; background:linear-gradient(135deg,var(--primary),var(--green)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; text-decoration:none; }
+    .login-wrap { flex:1; display:flex; align-items:center; justify-content:center; padding:40px 20px; }
+    .login-card {
+      background:var(--card); border:1px solid var(--border);
+      border-radius:24px; padding:44px 40px; width:100%; max-width:400px;
+      box-shadow:0 20px 60px rgba(0,0,0,0.4);
+    }
+    .card-icon { font-size:3rem; text-align:center; display:block; margin-bottom:12px; }
+    .login-card h2 { font-size:1.7rem; font-weight:800; text-align:center; margin-bottom:8px; }
+    .login-card > p { color:var(--text-muted); text-align:center; font-size:0.9rem; margin-bottom:32px; }
+    .form-group { margin-bottom:20px; }
+    label { display:block; margin-bottom:8px; font-size:0.82rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; }
+    input {
+      width:100%; padding:12px 16px; background:rgba(255,255,255,0.05);
+      border:1px solid var(--border); border-radius:10px; color:var(--text);
+      font-family:'Inter',sans-serif; font-size:0.93rem; outline:none; transition:all 0.2s;
+    }
+    input:focus { border-color:var(--primary); background:rgba(108,99,255,0.06); box-shadow:0 0 0 3px rgba(108,99,255,0.15); }
+    input::placeholder { color:var(--text-muted); }
+    .pw-wrap { position:relative; }
+    .toggle-pw { position:absolute; right:14px; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--text-muted); cursor:pointer; }
+    .btn-login {
+      width:100%; padding:13px;
+      background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+      color:#fff; font-family:'Inter',sans-serif;
+      font-size:0.95rem; font-weight:700; border:none; border-radius:12px;
+      cursor:pointer; transition:all 0.25s;
+    }
+    .btn-login:hover { transform:translateY(-2px); box-shadow:0 8px 25px rgba(108,99,255,0.4); }
+    .error-banner { background:rgba(255,101,132,0.15); border:1px solid #ff6584; color:#ff6584; padding:10px 16px; border-radius:10px; font-size:0.88rem; margin-bottom:16px; display:none; }
+    .error-banner.show { display:block; }
+    .hod-note { margin-top:16px; background:rgba(108,99,255,0.1); border:1px solid rgba(108,99,255,0.3); border-radius:10px; padding:12px 16px; font-size:0.82rem; color:var(--text-muted); text-align:center; }
+    .hod-note strong { color:var(--primary); }
+
+    /* DASHBOARD */
+    #dashboard { display:none; min-height:100vh; position:relative; z-index:5; }
+    .dash-header {
+      padding:16px 32px; display:flex; align-items:center; justify-content:space-between;
+      border-bottom:1px solid var(--border);
+      background:rgba(15,15,26,0.85); backdrop-filter:blur(12px);
+      position:sticky; top:0; z-index:50;
+    }
+    .dash-logo { font-size:1.1rem; font-weight:800; background:linear-gradient(135deg,var(--primary),var(--green)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .user-chip { display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.06); border:1px solid var(--border); border-radius:50px; padding:6px 16px 6px 8px; }
+    .avatar { width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--green)); display:flex; align-items:center; justify-content:center; font-size:0.85rem; font-weight:700; color:#fff; }
+    .logout-btn { background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:0.85rem; margin-left:8px; transition:color 0.2s; }
+    .logout-btn:hover { color:var(--rejected); }
+
+    .dash-body { padding:32px; max-width:1200px; margin:0 auto; }
+    .page-title { font-size:1.8rem; font-weight:800; margin-bottom:6px; }
+    .page-sub { color:var(--text-muted); font-size:0.9rem; margin-bottom:32px; }
+
+    /* Stats */
+    .stats-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:16px; margin-bottom:32px; }
+    .stat-card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:20px; text-align:center; }
+    .stat-num { font-size:2rem; font-weight:800; }
+    .stat-lbl { font-size:0.78rem; color:var(--text-muted); margin-top:4px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; }
+    .stat-card.total .stat-num { color:var(--primary); }
+    .stat-card.pending .stat-num { color:var(--pending); }
+    .stat-card.approved .stat-num { color:var(--approved); }
+    .stat-card.rejected .stat-num { color:var(--rejected); }
+
+    /* Filters */
+    .filters-bar { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:24px; align-items:center; }
+    .tabs { display:flex; gap:4px; background:var(--card); border:1px solid var(--border); border-radius:12px; padding:5px; }
+    .tab { padding:9px 20px; border-radius:9px; cursor:pointer; font-size:0.88rem; font-weight:600; color:var(--text-muted); transition:all 0.2s; border:none; background:none; font-family:'Inter',sans-serif; }
+    .tab.active { background:linear-gradient(135deg,var(--primary),var(--primary-dark)); color:#fff; }
+    .search-input {
+      flex:1; min-width:200px; padding:10px 16px;
+      background:var(--card); border:1px solid var(--border);
+      border-radius:10px; color:var(--text); font-family:'Inter',sans-serif;
+      font-size:0.88rem; outline:none; transition:all 0.2s;
+    }
+    .search-input:focus { border-color:var(--primary); }
+    .search-input::placeholder { color:var(--text-muted); }
+
+    /* Leave Cards */
+    .leave-card {
+      background:var(--card); border:1px solid var(--border);
+      border-radius:20px; padding:24px 28px; margin-bottom:16px;
+      animation:fadeIn 0.3s ease;
+      transition:border-color 0.2s;
+    }
+    .leave-card:hover { border-color:rgba(255,255,255,0.12); }
+    .leave-card.approved { border-left:4px solid var(--approved); }
+    .leave-card.rejected { border-left:4px solid var(--rejected); }
+    .leave-card.pending  { border-left:4px solid var(--pending); }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+
+    .lc-top { display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px; margin-bottom:14px; }
+    .student-info h4 { font-size:1rem; font-weight:700; }
+    .student-info p { font-size:0.83rem; color:var(--text-muted); margin-top:3px; }
+    .status-badge { padding:5px 14px; border-radius:50px; font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; }
+    .status-badge.pending  { background:rgba(247,201,72,0.15);  color:var(--pending);  border:1px solid rgba(247,201,72,0.3); }
+    .status-badge.approved { background:rgba(67,233,123,0.15); color:var(--approved); border:1px solid rgba(67,233,123,0.3); }
+    .status-badge.rejected { background:rgba(255,101,132,0.15);color:var(--rejected); border:1px solid rgba(255,101,132,0.3); }
+
+    .lc-meta { display:flex; flex-wrap:wrap; gap:20px; margin-bottom:14px; }
+    .lc-meta span { font-size:0.84rem; color:var(--text-muted); display:flex; align-items:center; gap:5px; }
+    .leave-reason { font-size:0.9rem; color:var(--text-muted); padding:12px 16px; background:rgba(255,255,255,0.03); border-radius:10px; border-left:3px solid var(--border); margin-bottom:16px; }
+
+    /* Action area */
+    .action-area { display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end; }
+    .remark-input {
+      flex:1; min-width:200px; padding:10px 14px;
+      background:rgba(255,255,255,0.05); border:1px solid var(--border);
+      border-radius:10px; color:var(--text); font-family:'Inter',sans-serif;
+      font-size:0.88rem; outline:none; transition:all 0.2s;
+    }
+    .remark-input:focus { border-color:var(--primary); }
+    .remark-input::placeholder { color:var(--text-muted); }
+    .btn-approve, .btn-reject {
+      padding:10px 22px; border-radius:10px; font-family:'Inter',sans-serif;
+      font-size:0.88rem; font-weight:700; cursor:pointer; border:none; transition:all 0.2s;
+    }
+    .btn-approve { background:rgba(67,233,123,0.15); color:var(--approved); border:1px solid rgba(67,233,123,0.3); }
+    .btn-approve:hover { background:var(--approved); color:#0f0f1a; }
+    .btn-reject  { background:rgba(255,101,132,0.15); color:var(--rejected); border:1px solid rgba(255,101,132,0.3); }
+    .btn-reject:hover  { background:var(--rejected); color:#fff; }
+    .decided-note { font-size:0.82rem; color:var(--text-muted); padding:10px 14px; background:rgba(255,255,255,0.03); border-radius:8px; }
+    .decided-note.approved { color:var(--approved); background:rgba(67,233,123,0.06); border-left:3px solid var(--approved); }
+    .decided-note.rejected { color:var(--rejected); background:rgba(255,101,132,0.06); border-left:3px solid var(--rejected); }
+
+    .empty-state { text-align:center; padding:60px 20px; color:var(--text-muted); }
+    .empty-state div { font-size:3rem; margin-bottom:12px; }
+
+    .toast { position:fixed; bottom:24px; right:24px; z-index:1000; padding:14px 24px; border-radius:12px; font-weight:700; font-size:0.9rem; box-shadow:0 8px 30px rgba(0,0,0,0.4); transform:translateY(80px); opacity:0; transition:all 0.4s; display:flex; align-items:center; gap:8px; }
+    .toast.show { transform:translateY(0); opacity:1; }
+    .toast.success { background:var(--approved); color:#0f0f1a; }
+    .toast.info    { background:var(--rejected);  color:#fff; }
+  </style>
+</head>
+<body>
+  <div class="bg-orbs"><div class="orb orb1"></div><div class="orb orb2"></div></div>
+
+  <!-- LOGIN -->
+  <div id="loginScreen">
+    <header>
+      <a href="index.html" class="logo">🎓 EduLeave</a>
+    </header>
+    <div class="login-wrap">
+      <div class="login-card">
+        <span class="card-icon">🏛️</span>
+        <h2>HOD Login</h2>
+        <p>Head of Department — Leave Management Portal</p>
+        <div class="error-banner" id="loginError">❌ Invalid credentials</div>
+        <form onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <label>HOD Username</label>
+            <input type="text" id="hodUser" placeholder="e.g. hod_cse" required />
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <div class="pw-wrap">
+              <input type="password" id="hodPw" placeholder="HOD password" required />
+              <button type="button" class="toggle-pw" onclick="togglePw()">👁</button>
+            </div>
+          </div>
+          <button type="submit" class="btn-login">Login as HOD →</button>
+        </form>
+        <div class="hod-note">Default credentials: <strong>hod_cse</strong> / <strong>hod@123</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dashboard">
+    <div class="dash-header">
+      <span class="dash-logo">🎓 EduLeave — HOD Portal</span>
+      <div class="user-chip">
+        <div class="avatar">HD</div>
+        <span>HOD — CSE</span>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+      </div>
+    </div>
+
+    <div class="dash-body">
+      <div class="page-title">Leave Applications</div>
+      <div class="page-sub">Review and approve/reject student leave requests. Approved leaves protect attendance automatically.</div>
+
+      <div class="stats-row">
+        <div class="stat-card total"><div class="stat-num" id="statTotal">0</div><div class="stat-lbl">Total</div></div>
+        <div class="stat-card pending"><div class="stat-num" id="statPending">0</div><div class="stat-lbl">Pending</div></div>
+        <div class="stat-card approved"><div class="stat-num" id="statApproved">0</div><div class="stat-lbl">Approved</div></div>
+        <div class="stat-card rejected"><div class="stat-num" id="statRejected">0</div><div class="stat-lbl">Rejected</div></div>
+      </div>
+
+      <div class="filters-bar">
+        <div class="tabs">
+          <button class="tab active" onclick="setFilter('all', this)">All</button>
+          <button class="tab" onclick="setFilter('pending', this)">⏳ Pending</button>
+          <button class="tab" onclick="setFilter('approved', this)">✅ Approved</button>
+          <button class="tab" onclick="setFilter('rejected', this)">❌ Rejected</button>
+        </div>
+        <input class="search-input" id="searchInput" type="text" placeholder="🔍 Search by name, roll or leave type…" oninput="renderLeaves()" />
+      </div>
+
+      <div id="leaveList"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const HOD_CREDS = [
+      { user: 'hod_cse', pw: 'hod@123', name: 'HOD — CSE', dept: 'Computer Science' },
+      { user: 'hod_it',  pw: 'hod@123', name: 'HOD — IT',  dept: 'Information Technology' },
+      { user: 'admin',   pw: 'admin123', name: 'Admin',     dept: 'All Departments' },
+    ];
+
+    let currentFilter = 'all';
+
+    function togglePw() {
+      const inp = document.getElementById('hodPw');
+      inp.type = inp.type === 'password' ? 'text' : 'password';
+    }
+
+    function getLeaves() { return JSON.parse(localStorage.getItem('eduLeave_leaves') || '[]'); }
+    function saveLeaves(arr) { localStorage.setItem('eduLeave_leaves', JSON.stringify(arr)); }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const user = document.getElementById('hodUser').value.trim().toLowerCase();
+      const pw   = document.getElementById('hodPw').value;
+      const found = HOD_CREDS.find(c => c.user === user && c.pw === pw);
+      if (!found) {
+        document.getElementById('loginError').classList.add('show');
+        return;
+      }
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+      renderLeaves();
+    }
+
+    function logout() {
+      document.getElementById('loginScreen').style.display = '';
+      document.getElementById('dashboard').style.display = 'none';
+      document.getElementById('hodUser').value = '';
+      document.getElementById('hodPw').value = '';
+      document.getElementById('loginError').classList.remove('show');
+    }
+
+    function setFilter(f, btn) {
+      currentFilter = f;
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      renderLeaves();
+    }
+
+    function decide(id, decision) {
+      const remark = document.getElementById('remark_' + id).value.trim() || (decision === 'approved' ? 'Leave Approved by HOD' : 'Leave Rejected by HOD');
+      const leaves = getLeaves();
+      const idx = leaves.findIndex(l => l.id === id);
+      if (idx === -1) return;
+      leaves[idx].status = decision;
+      leaves[idx].hodRemark = remark;
+      leaves[idx].decidedAt = new Date().toISOString();
+      saveLeaves(leaves);
+      showToast(decision === 'approved' ? '✅ Leave Approved & Attendance Protected!' : '❌ Leave Rejected', decision === 'approved' ? 'success' : 'info');
+      renderLeaves();
+    }
+
+    function renderLeaves() {
+      const all = getLeaves();
+      const search = (document.getElementById('searchInput')?.value || '').toLowerCase();
+      let list = currentFilter === 'all' ? all : all.filter(l => l.status === currentFilter);
+      if (search) list = list.filter(l =>
+        l.studentName.toLowerCase().includes(search) ||
+        l.rollNo.toLowerCase().includes(search) ||
+        l.type.toLowerCase().includes(search)
+      );
+
+      // Stats (from all leaves)
+      document.getElementById('statTotal').textContent    = all.length;
+      document.getElementById('statPending').textContent  = all.filter(l => l.status === 'pending').length;
+      document.getElementById('statApproved').textContent = all.filter(l => l.status === 'approved').length;
+      document.getElementById('statRejected').textContent = all.filter(l => l.status === 'rejected').length;
+
+      const container = document.getElementById('leaveList');
+      if (!list.length) {
+        container.innerHTML = `<div class="empty-state"><div>📭</div>No leave applications found.</div>`;
+        return;
+      }
+
+      container.innerHTML = list.reverse().map(l => `
+        <div class="leave-card ${l.status}">
+          <div class="lc-top">
+            <div class="student-info">
+              <h4>🧑‍🎓 ${l.studentName} &nbsp;<span style="font-weight:400;color:var(--text-muted)">(${l.rollNo})</span></h4>
+              <p>${l.course} | ${l.year} | Section: ${l.section}</p>
+            </div>
+            <span class="status-badge ${l.status}">${l.status.charAt(0).toUpperCase()+l.status.slice(1)}</span>
+          </div>
+          <div class="lc-meta">
+            <span>📋 ${l.type}</span>
+            <span>📅 ${formatDate(l.from)} → ${formatDate(l.to)}</span>
+            <span>🗓 ${l.days} day(s)</span>
+            <span>🕒 Applied: ${formatDate(l.appliedAt)}</span>
+            ${l.decidedAt ? `<span>✔ Decided: ${formatDate(l.decidedAt)}</span>` : ''}
+          </div>
+          <div class="leave-reason">💬 ${l.reason}</div>
+          ${l.status === 'pending' ? `
+            <div class="action-area">
+              <input class="remark-input" id="remark_${l.id}" type="text" placeholder="Add remark (optional)…" />
+              <button class="btn-approve" onclick="decide('${l.id}','approved')">✅ Approve</button>
+              <button class="btn-reject"  onclick="decide('${l.id}','rejected')">❌ Reject</button>
+            </div>
+          ` : `
+            <div class="decided-note ${l.status}">
+              ${l.status === 'approved' ? '✅' : '❌'} HOD Remark: ${l.hodRemark || '—'}
+            </div>
+          `}
+        </div>
+      `).join('');
+    }
+
+    function formatDate(d) {
+      if (!d) return '—';
+      const dt = new Date(d);
+      return dt.toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
+    }
+
+    function showToast(msg, type = 'success') {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = `toast ${type} show`;
+      setTimeout(() => t.classList.remove('show'), 3200);
+    }
+  </script>
+</body>
+</html>

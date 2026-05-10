@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Registration — RRIT</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --primary: #43e97b;
+      --primary-dark: #2ec45e;
+      --bg: #0f0f1a;
+      --bg2: #1a1a2e;
+      --card: #1e1e35;
+      --text: #e8e8f0;
+      --text-muted: #9090b0;
+      --border: #2a2a45;
+      --error: #ff6584;
+      --success: #43e97b;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+    }
+    .bg-orbs { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+    .orb {
+      position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.12;
+      animation: float 8s ease-in-out infinite;
+    }
+    .orb1 { width: 450px; height: 450px; background: var(--primary); top: -80px; right: -80px; }
+    .orb2 { width: 350px; height: 350px; background: #6c63ff; bottom: -60px; left: -60px; animation-delay: 4s; }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-20px)} }
+
+    header {
+      position: relative; z-index: 10;
+      padding: 16px 32px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      background: rgba(15,15,26,0.8); backdrop-filter: blur(12px);
+    }
+    .logo {
+      font-size: 1.2rem; font-weight: 800;
+      background: linear-gradient(135deg, #6c63ff, var(--primary));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      text-decoration: none;
+    }
+    .back-btn {
+      color: var(--text-muted); text-decoration: none;
+      font-size: 0.88rem; display: flex; align-items: center; gap: 6px;
+      transition: color 0.2s;
+    }
+    .back-btn:hover { color: var(--text); }
+
+    main {
+      flex: 1; display: flex; align-items: center; justify-content: center;
+      padding: 40px 20px;
+      position: relative; z-index: 5;
+    }
+    .register-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 44px 40px;
+      width: 100%; max-width: 520px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    }
+    .card-header {
+      text-align: center; margin-bottom: 36px;
+    }
+    .card-icon { font-size: 3rem; display: block; margin-bottom: 12px; }
+    .card-header h2 { font-size: 1.7rem; font-weight: 800; margin-bottom: 8px; }
+    .card-header p { color: var(--text-muted); font-size: 0.9rem; }
+
+    .form-row { display: flex; gap: 16px; }
+    .form-group {
+      margin-bottom: 20px; flex: 1;
+    }
+    label {
+      display: block; margin-bottom: 8px;
+      font-size: 0.85rem; font-weight: 600;
+      color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    input, select, textarea {
+      width: 100%; padding: 12px 16px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text); font-family: 'Inter', sans-serif;
+      font-size: 0.93rem;
+      transition: all 0.2s; outline: none;
+      -webkit-appearance: none;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+      background: rgba(67,233,123,0.06);
+      box-shadow: 0 0 0 3px rgba(67,233,123,0.12);
+    }
+    input::placeholder { color: var(--text-muted); }
+    select option { background: #1e1e35; color: var(--text); }
+
+    .password-wrapper { position: relative; }
+    .toggle-pw {
+      position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; color: var(--text-muted);
+      cursor: pointer; font-size: 1rem;
+    }
+
+    .avatar-section {
+      display: flex; align-items: center; gap: 16px;
+      background: rgba(255,255,255,0.03);
+      border: 1px dashed var(--border);
+      border-radius: 12px; padding: 16px;
+      margin-bottom: 20px;
+    }
+    .avatar-preview {
+      width: 60px; height: 60px; border-radius: 50%;
+      background: linear-gradient(135deg, #6c63ff, var(--primary));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; flex-shrink: 0;
+    }
+    .avatar-info p { font-size: 0.85rem; color: var(--text-muted); }
+    .avatar-info strong { color: var(--text); }
+
+    .submit-btn {
+      width: 100%; padding: 14px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #0f0f1a; font-family: 'Inter', sans-serif;
+      font-size: 0.95rem; font-weight: 700;
+      border: none; border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.25s;
+      margin-top: 8px;
+    }
+    .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(67,233,123,0.4); }
+    .submit-btn:active { transform: translateY(0); }
+
+    .login-link {
+      text-align: center; margin-top: 20px;
+      font-size: 0.88rem; color: var(--text-muted);
+    }
+    .login-link a { color: var(--primary); text-decoration: none; font-weight: 600; }
+    .login-link a:hover { text-decoration: underline; }
+
+    .divider {
+      display: flex; align-items: center; gap: 12px;
+      margin: 24px 0 20px;
+    }
+    .divider::before, .divider::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+    .divider span { color: var(--text-muted); font-size: 0.8rem; }
+
+    /* Success Toast */
+    .toast {
+      position: fixed; top: 24px; right: 24px; z-index: 1000;
+      background: var(--success);
+      color: #0f0f1a; font-weight: 700;
+      padding: 14px 24px; border-radius: 12px;
+      box-shadow: 0 8px 30px rgba(67,233,123,0.4);
+      transform: translateX(200px); opacity: 0;
+      transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .toast.show { transform: translateX(0); opacity: 1; }
+
+    .error-msg {
+      color: var(--error); font-size: 0.8rem;
+      margin-top: 5px; display: none;
+    }
+    .error-msg.show { display: block; }
+
+    .strength-bar {
+      height: 4px; border-radius: 2px;
+      background: var(--border);
+      margin-top: 8px; overflow: hidden;
+    }
+    .strength-fill {
+      height: 100%; border-radius: 2px;
+      width: 0; transition: all 0.3s;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-orbs">
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+  </div>
+
+  <header>
+    <a href="index.html" class="logo">🎓 EduLeave</a>
+    <a href="index.html" class="back-btn">← Back to Home</a>
+  </header>
+
+  <main>
+    <div class="register-card">
+      <div class="card-header">
+        <span class="card-icon">🧑‍🎓</span>
+        <h2>Student Registration</h2>
+        <p>Create your account to start applying for leaves</p>
+      </div>
+
+      <form id="registerForm" onsubmit="handleRegister(event)">
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="firstName">First Name</label>
+            <input type="text" id="firstName" placeholder="Ayush" required />
+            <div class="error-msg" id="err-firstName">Please enter your first name</div>
+          </div>
+          <div class="form-group">
+            <label for="lastName">Last Name</label>
+            <input type="text" id="lastName" placeholder="Sharma" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="rollNo">Roll Number</label>
+          <input type="text" id="rollNo" placeholder="e.g. CS2024001" required />
+          <div class="error-msg" id="err-rollNo">Roll number already registered</div>
+        </div>
+
+        <div class="form-group">
+          <label for="email">College Email</label>
+          <input type="email" id="email" placeholder="ayush@college.edu" required />
+          <div class="error-msg" id="err-email">Email already registered</div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="course">Course</label>
+            <select id="course" required>
+              <option value="">Select Course</option>
+              <option>B.Tech CSE</option>
+              <option>B.Tech IT</option>
+              <option>B.Tech ECE</option>
+              <option>B.Tech Mechanical</option>
+              <option>BCA</option>
+              <option>MCA</option>
+              <option>MBA</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="year">Year</label>
+            <select id="year" required>
+              <option value="">Year</option>
+              <option>1st Year</option>
+              <option>2nd Year</option>
+              <option>3rd Year</option>
+              <option>4th Year</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="section">Section / Division</label>
+          <input type="text" id="section" placeholder="e.g. A, B, C" required />
+        </div>
+
+        <div class="form-group">
+          <label for="phone">Phone Number</label>
+          <input type="tel" id="phone" placeholder="10-digit mobile number"
+            pattern="[0-9]{10}" maxlength="10" required />
+        </div>
+
+        <div class="divider"><span>Set Password</span></div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="password-wrapper">
+            <input type="password" id="password" placeholder="Min 6 characters" required
+              oninput="checkStrength(this.value)" />
+            <button type="button" class="toggle-pw" onclick="togglePw('password')">👁</button>
+          </div>
+          <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPw">Confirm Password</label>
+          <div class="password-wrapper">
+            <input type="password" id="confirmPw" placeholder="Repeat password" required />
+            <button type="button" class="toggle-pw" onclick="togglePw('confirmPw')">👁</button>
+          </div>
+          <div class="error-msg" id="err-pw">Passwords do not match</div>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submitBtn">
+          Create Account →
+        </button>
+      </form>
+
+      <div class="login-link">
+        Already registered? <a href="student-portal.html">Login here</a>
+      </div>
+    </div>
+  </main>
+
+  <div class="toast" id="toast">✅ Registration Successful! Redirecting…</div>
+
+  <script>
+    // Load existing students
+    function getStudents() {
+      return JSON.parse(localStorage.getItem('eduLeave_students') || '[]');
+    }
+    function saveStudents(arr) {
+      localStorage.setItem('eduLeave_students', JSON.stringify(arr));
+    }
+
+    function togglePw(id) {
+      const inp = document.getElementById(id);
+      inp.type = inp.type === 'password' ? 'text' : 'password';
+    }
+
+    function checkStrength(val) {
+      const fill = document.getElementById('strengthFill');
+      let score = 0;
+      if (val.length >= 6) score++;
+      if (val.length >= 10) score++;
+      if (/[A-Z]/.test(val)) score++;
+      if (/[0-9]/.test(val)) score++;
+      if (/[^A-Za-z0-9]/.test(val)) score++;
+      const colors = ['#ff6584','#f7971e','#f7c948','#43e97b','#43e97b'];
+      fill.style.width = (score * 20) + '%';
+      fill.style.background = colors[score - 1] || 'transparent';
+    }
+
+    function handleRegister(e) {
+      e.preventDefault();
+      let valid = true;
+
+      // Reset errors
+      document.querySelectorAll('.error-msg').forEach(el => el.classList.remove('show'));
+
+      const firstName = document.getElementById('firstName').value.trim();
+      const lastName  = document.getElementById('lastName').value.trim();
+      const rollNo    = document.getElementById('rollNo').value.trim().toUpperCase();
+      const email     = document.getElementById('email').value.trim().toLowerCase();
+      const course    = document.getElementById('course').value;
+      const year      = document.getElementById('year').value;
+      const section   = document.getElementById('section').value.trim();
+      const phone     = document.getElementById('phone').value.trim();
+      const password  = document.getElementById('password').value;
+      const confirmPw = document.getElementById('confirmPw').value;
+
+      const students = getStudents();
+
+      // Check duplicate roll
+      if (students.find(s => s.rollNo === rollNo)) {
+        document.getElementById('err-rollNo').classList.add('show');
+        valid = false;
+      }
+      // Check duplicate email
+      if (students.find(s => s.email === email)) {
+        document.getElementById('err-email').classList.add('show');
+        valid = false;
+      }
+      // Check passwords
+      if (password !== confirmPw) {
+        document.getElementById('err-pw').classList.add('show');
+        valid = false;
+      }
+
+      if (!valid) return;
+
+      const newStudent = {
+        id: Date.now().toString(),
+        firstName, lastName,
+        name: firstName + ' ' + lastName,
+        rollNo, email, course, year, section, phone, password,
+        registeredAt: new Date().toISOString()
+      };
+
+      students.push(newStudent);
+      saveStudents(students);
+
+      // Show success
+      document.getElementById('toast').classList.add('show');
+      document.getElementById('submitBtn').textContent = '✅ Registered!';
+      document.getElementById('submitBtn').disabled = true;
+
+      setTimeout(() => {
+        window.location.href = 'student-portal.html';
+      }, 2000);
+    }
+  </script>
+</body>
+</html>
