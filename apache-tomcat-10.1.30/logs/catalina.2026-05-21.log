@@ -1,0 +1,75 @@
+21-May-2026 22:39:11.794 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Server version name:   Apache Tomcat/10.1.30
+21-May-2026 22:39:11.799 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Server built:          Sep 13 2024 20:26:16 UTC
+21-May-2026 22:39:11.799 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Server version number: 10.1.30.0
+21-May-2026 22:39:11.800 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log OS Name:               Windows 11
+21-May-2026 22:39:11.800 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log OS Version:            10.0
+21-May-2026 22:39:11.800 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Architecture:          amd64
+21-May-2026 22:39:11.800 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Java Home:             C:\Program Files\Eclipse Adoptium\jdk-17.0.15.6-hotspot
+21-May-2026 22:39:11.800 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log JVM Version:           17.0.15+6
+21-May-2026 22:39:11.800 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log JVM Vendor:            Eclipse Adoptium
+21-May-2026 22:39:11.801 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log CATALINA_BASE:         C:\Users\BHOOMIKA M\Student-Attendance-System\apache-tomcat-10.1.30
+21-May-2026 22:39:11.801 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log CATALINA_HOME:         C:\Users\BHOOMIKA M\Student-Attendance-System\apache-tomcat-10.1.30
+21-May-2026 22:39:11.815 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.util.logging.config.file=C:\Users\BHOOMIKA M\Student-Attendance-System\apache-tomcat-10.1.30\conf\logging.properties
+21-May-2026 22:39:11.815 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager
+21-May-2026 22:39:11.816 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djdk.tls.ephemeralDHKeySize=2048
+21-May-2026 22:39:11.816 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.protocol.handler.pkgs=org.apache.catalina.webresources
+21-May-2026 22:39:11.816 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: --add-opens=java.base/java.lang=ALL-UNNAMED
+21-May-2026 22:39:11.816 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: --add-opens=java.base/java.io=ALL-UNNAMED
+21-May-2026 22:39:11.816 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: --add-opens=java.base/java.util=ALL-UNNAMED
+21-May-2026 22:39:11.816 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: --add-opens=java.base/java.util.concurrent=ALL-UNNAMED
+21-May-2026 22:39:11.816 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: --add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED
+21-May-2026 22:39:11.817 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dcatalina.base=C:\Users\BHOOMIKA M\Student-Attendance-System\apache-tomcat-10.1.30
+21-May-2026 22:39:11.817 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dcatalina.home=C:\Users\BHOOMIKA M\Student-Attendance-System\apache-tomcat-10.1.30
+21-May-2026 22:39:11.817 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.io.tmpdir=C:\Users\BHOOMIKA M\Student-Attendance-System\apache-tomcat-10.1.30\temp
+21-May-2026 22:39:11.823 INFO [main] org.apache.catalina.core.AprLifecycleListener.lifecycleEvent Loaded Apache Tomcat Native library [2.0.8] using APR version [1.7.4].
+21-May-2026 22:39:11.839 INFO [main] org.apache.catalina.core.AprLifecycleListener.initializeSSL OpenSSL successfully initialized [OpenSSL 3.0.14 4 Jun 2024]
+21-May-2026 22:39:12.024 INFO [main] org.apache.coyote.AbstractProtocol.init Initializing ProtocolHandler ["http-nio-8080"]
+21-May-2026 22:39:12.046 SEVERE [main] org.apache.catalina.util.LifecycleBase.handleSubClassException Failed to initialize component [Connector["http-nio-8080"]]
+	org.apache.catalina.LifecycleException: Protocol handler initialization failed
+		at org.apache.catalina.connector.Connector.initInternal(Connector.java:1030)
+		at org.apache.catalina.util.LifecycleBase.init(LifecycleBase.java:122)
+		at org.apache.catalina.core.StandardService.initInternal(StandardService.java:525)
+		at org.apache.catalina.util.LifecycleBase.init(LifecycleBase.java:122)
+		at org.apache.catalina.core.StandardServer.initInternal(StandardServer.java:957)
+		at org.apache.catalina.util.LifecycleBase.init(LifecycleBase.java:122)
+		at org.apache.catalina.startup.Catalina.load(Catalina.java:708)
+		at org.apache.catalina.startup.Catalina.load(Catalina.java:731)
+		at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+		at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+		at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+		at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+		at org.apache.catalina.startup.Bootstrap.load(Bootstrap.java:302)
+		at org.apache.catalina.startup.Bootstrap.main(Bootstrap.java:472)
+	Caused by: java.net.BindException: Address already in use: bind
+		at java.base/sun.nio.ch.Net.bind0(Native Method)
+		at java.base/sun.nio.ch.Net.bind(Net.java:555)
+		at java.base/sun.nio.ch.ServerSocketChannelImpl.netBind(ServerSocketChannelImpl.java:337)
+		at java.base/sun.nio.ch.ServerSocketChannelImpl.bind(ServerSocketChannelImpl.java:294)
+		at org.apache.tomcat.util.net.NioEndpoint.initServerSocket(NioEndpoint.java:239)
+		at org.apache.tomcat.util.net.NioEndpoint.bind(NioEndpoint.java:194)
+		at org.apache.tomcat.util.net.AbstractEndpoint.bindWithCleanup(AbstractEndpoint.java:1304)
+		at org.apache.tomcat.util.net.AbstractEndpoint.init(AbstractEndpoint.java:1317)
+		at org.apache.coyote.AbstractProtocol.init(AbstractProtocol.java:633)
+		at org.apache.coyote.http11.AbstractHttp11Protocol.init(AbstractHttp11Protocol.java:79)
+		at org.apache.catalina.connector.Connector.initInternal(Connector.java:1028)
+		... 13 more
+21-May-2026 22:39:12.047 INFO [main] org.apache.catalina.startup.Catalina.load Server initialization in [413] milliseconds
+21-May-2026 22:39:12.087 INFO [main] org.apache.catalina.core.StandardService.startInternal Starting service [Catalina]
+21-May-2026 22:39:12.087 INFO [main] org.apache.catalina.core.StandardEngine.startInternal Starting Servlet engine: [Apache Tomcat/10.1.30]
+21-May-2026 22:39:12.096 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory [C:\Users\BHOOMIKA M\Student-Attendance-System\apache-tomcat-10.1.30\webapps\docs]
+21-May-2026 22:39:12.411 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory [C:\Users\BHOOMIKA M\Student-Attendance-System\apache-tomcat-10.1.30\webapps\docs] has finished in [315] ms
+21-May-2026 22:39:12.412 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory [C:\Users\BHOOMIKA M\Student-Attendance-System\apache-tomcat-10.1.30\webapps\examples]
+21-May-2026 22:39:12.769 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory [C:\Users\BHOOMIKA M\Student-Attendance-System\apache-tomcat-10.1.30\webapps\examples] has finished in [356] ms
+21-May-2026 22:39:12.771 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory [C:\Users\BHOOMIKA M\Student-Attendance-System\apache-tomcat-10.1.30\webapps\host-manager]
+21-May-2026 22:39:12.815 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory [C:\Users\BHOOMIKA M\Student-Attendance-System\apache-tomcat-10.1.30\webapps\host-manager] has finished in [45] ms
+21-May-2026 22:39:12.816 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory [C:\Users\BHOOMIKA M\Student-Attendance-System\apache-tomcat-10.1.30\webapps\manager]
+21-May-2026 22:39:12.853 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory [C:\Users\BHOOMIKA M\Student-Attendance-System\apache-tomcat-10.1.30\webapps\manager] has finished in [37] ms
+21-May-2026 22:39:12.854 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory [C:\Users\BHOOMIKA M\Student-Attendance-System\apache-tomcat-10.1.30\webapps\ROOT]
+21-May-2026 22:39:12.876 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory [C:\Users\BHOOMIKA M\Student-Attendance-System\apache-tomcat-10.1.30\webapps\ROOT] has finished in [23] ms
+21-May-2026 22:39:12.876 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory [C:\Users\BHOOMIKA M\Student-Attendance-System\apache-tomcat-10.1.30\webapps\student]
+21-May-2026 22:39:13.157 INFO [main] org.apache.jasper.servlet.TldScanner.scanJars At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+21-May-2026 22:39:13.163 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory [C:\Users\BHOOMIKA M\Student-Attendance-System\apache-tomcat-10.1.30\webapps\student] has finished in [286] ms
+21-May-2026 22:39:13.163 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory [C:\Users\BHOOMIKA M\Student-Attendance-System\apache-tomcat-10.1.30\webapps\StudentAttendance]
+21-May-2026 22:39:13.377 INFO [main] org.apache.jasper.servlet.TldScanner.scanJars At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+21-May-2026 22:39:13.380 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory [C:\Users\BHOOMIKA M\Student-Attendance-System\apache-tomcat-10.1.30\webapps\StudentAttendance] has finished in [216] ms
+21-May-2026 22:39:13.384 INFO [main] org.apache.catalina.startup.Catalina.start Server startup in [1336] milliseconds

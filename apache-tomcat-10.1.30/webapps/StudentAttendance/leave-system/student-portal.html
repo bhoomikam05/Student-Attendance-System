@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Portal — EduLeave</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --primary: #43e97b;
+      --primary-dark: #2ec45e;
+      --bg: #0f0f1a; --bg2: #1a1a2e;
+      --card: #1e1e35; --card2: #252545;
+      --text: #e8e8f0; --text-muted: #9090b0;
+      --border: #2a2a45;
+      --pending: #f7c948; --approved: #43e97b; --rejected: #ff6584;
+      --purple: #6c63ff;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+
+    .bg-orbs { position:fixed; inset:0; pointer-events:none; z-index:0; }
+    .orb { position:absolute; border-radius:50%; filter:blur(80px); opacity:0.1; animation:float 8s ease-in-out infinite; }
+    .orb1 { width:400px; height:400px; background:var(--primary); top:-60px; right:-60px; }
+    .orb2 { width:350px; height:350px; background:var(--purple); bottom:-60px; left:-60px; animation-delay:4s; }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-20px)} }
+
+    /* ===== LOGIN SCREEN ===== */
+    #loginScreen {
+      position:relative; z-index:5;
+      min-height:100vh; display:flex; flex-direction:column;
+    }
+    header {
+      padding:16px 32px;
+      display:flex; align-items:center; justify-content:space-between;
+      border-bottom:1px solid var(--border);
+      background:rgba(15,15,26,0.8); backdrop-filter:blur(12px);
+    }
+    .logo {
+      font-size:1.2rem; font-weight:800;
+      background:linear-gradient(135deg,var(--purple),var(--primary));
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      text-decoration:none;
+    }
+    .header-links { display:flex; gap:16px; }
+    .header-links a { color:var(--text-muted); text-decoration:none; font-size:0.88rem; transition:color 0.2s; }
+    .header-links a:hover { color:var(--primary); }
+
+    .login-wrap {
+      flex:1; display:flex; align-items:center; justify-content:center;
+      padding:40px 20px;
+    }
+    .login-card {
+      background:var(--card); border:1px solid var(--border);
+      border-radius:24px; padding:44px 40px;
+      width:100%; max-width:420px;
+      box-shadow:0 20px 60px rgba(0,0,0,0.4);
+    }
+    .card-icon { font-size:3rem; text-align:center; display:block; margin-bottom:12px; }
+    .login-card h2 { font-size:1.7rem; font-weight:800; text-align:center; margin-bottom:8px; }
+    .login-card > p { color:var(--text-muted); text-align:center; font-size:0.9rem; margin-bottom:32px; }
+
+    .form-group { margin-bottom:20px; }
+    label { display:block; margin-bottom:8px; font-size:0.82rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; }
+    input, select {
+      width:100%; padding:12px 16px;
+      background:rgba(255,255,255,0.05); border:1px solid var(--border);
+      border-radius:10px; color:var(--text); font-family:'Inter',sans-serif;
+      font-size:0.93rem; transition:all 0.2s; outline:none;
+    }
+    input:focus, select:focus {
+      border-color:var(--primary); background:rgba(67,233,123,0.06);
+      box-shadow:0 0 0 3px rgba(67,233,123,0.12);
+    }
+    input::placeholder { color:var(--text-muted); }
+    .pw-wrap { position:relative; }
+    .toggle-pw { position:absolute; right:14px; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--text-muted); cursor:pointer; }
+
+    .btn-primary {
+      width:100%; padding:13px;
+      background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+      color:#0f0f1a; font-family:'Inter',sans-serif;
+      font-size:0.95rem; font-weight:700; border:none; border-radius:12px;
+      cursor:pointer; transition:all 0.25s;
+    }
+    .btn-primary:hover { transform:translateY(-2px); box-shadow:0 8px 25px rgba(67,233,123,0.4); }
+
+    .register-link { text-align:center; margin-top:18px; font-size:0.88rem; color:var(--text-muted); }
+    .register-link a { color:var(--primary); text-decoration:none; font-weight:600; }
+
+    .error-banner {
+      background:rgba(255,101,132,0.15); border:1px solid #ff6584;
+      color:#ff6584; padding:10px 16px; border-radius:10px;
+      font-size:0.88rem; margin-bottom:16px; display:none;
+    }
+    .error-banner.show { display:block; }
+
+    /* ===== DASHBOARD ===== */
+    #dashboard { display:none; min-height:100vh; position:relative; z-index:5; }
+
+    .dash-header {
+      padding:16px 32px;
+      display:flex; align-items:center; justify-content:space-between;
+      border-bottom:1px solid var(--border);
+      background:rgba(15,15,26,0.85); backdrop-filter:blur(12px);
+      position:sticky; top:0; z-index:50;
+    }
+    .dash-logo { font-size:1.1rem; font-weight:800; background:linear-gradient(135deg,var(--purple),var(--primary)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .user-chip {
+      display:flex; align-items:center; gap:10px;
+      background:rgba(255,255,255,0.06); border:1px solid var(--border);
+      border-radius:50px; padding:6px 16px 6px 8px;
+    }
+    .avatar {
+      width:32px; height:32px; border-radius:50%;
+      background:linear-gradient(135deg,var(--purple),var(--primary));
+      display:flex; align-items:center; justify-content:center;
+      font-size:0.85rem; font-weight:700; color:#fff;
+    }
+    .user-chip span { font-size:0.88rem; font-weight:600; }
+    .logout-btn {
+      background:none; border:none; color:var(--text-muted);
+      cursor:pointer; font-size:0.85rem; margin-left:8px;
+      transition:color 0.2s;
+    }
+    .logout-btn:hover { color:var(--rejected); }
+
+    .dash-body { padding:32px; max-width:1100px; margin:0 auto; }
+    .welcome-banner {
+      background:linear-gradient(135deg,rgba(108,99,255,0.2),rgba(67,233,123,0.1));
+      border:1px solid rgba(108,99,255,0.3);
+      border-radius:20px; padding:28px 32px;
+      margin-bottom:32px;
+      display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;
+    }
+    .welcome-banner h2 { font-size:1.5rem; font-weight:800; }
+    .welcome-banner p { color:var(--text-muted); font-size:0.9rem; margin-top:4px; }
+    .apply-btn {
+      padding:12px 24px;
+      background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+      color:#0f0f1a; font-weight:700; font-size:0.92rem;
+      border:none; border-radius:12px; cursor:pointer;
+      transition:all 0.25s;
+    }
+    .apply-btn:hover { transform:translateY(-2px); box-shadow:0 8px 25px rgba(67,233,123,0.4); }
+
+    /* Stats */
+    .stats-row {
+      display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+      gap:16px; margin-bottom:32px;
+    }
+    .stat-card {
+      background:var(--card); border:1px solid var(--border);
+      border-radius:16px; padding:20px;
+      text-align:center; transition:all 0.2s;
+    }
+    .stat-card:hover { border-color:var(--primary); transform:translateY(-3px); }
+    .stat-num { font-size:2rem; font-weight:800; }
+    .stat-lbl { font-size:0.8rem; color:var(--text-muted); margin-top:4px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; }
+    .stat-card.pending .stat-num { color:var(--pending); }
+    .stat-card.approved .stat-num { color:var(--approved); }
+    .stat-card.rejected .stat-num { color:var(--rejected); }
+    .stat-card.total .stat-num { color:var(--purple); }
+
+    /* Tabs */
+    .tabs { display:flex; gap:4px; margin-bottom:24px; background:var(--card); border:1px solid var(--border); border-radius:12px; padding:5px; width:fit-content; }
+    .tab {
+      padding:9px 20px; border-radius:9px; cursor:pointer;
+      font-size:0.88rem; font-weight:600; color:var(--text-muted);
+      transition:all 0.2s; border:none; background:none; font-family:'Inter',sans-serif;
+    }
+    .tab.active { background:linear-gradient(135deg,var(--primary),var(--primary-dark)); color:#0f0f1a; }
+
+    /* Leave Form Panel */
+    #applyPanel {
+      background:var(--card); border:1px solid var(--border);
+      border-radius:20px; padding:32px;
+      display:none; margin-bottom:24px;
+      animation:slideDown 0.3s ease;
+    }
+    #applyPanel.show { display:block; }
+    @keyframes slideDown { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
+    #applyPanel h3 { font-size:1.2rem; font-weight:700; margin-bottom:24px; display:flex; align-items:center; gap:8px; }
+    .form-row { display:flex; gap:16px; }
+    textarea {
+      width:100%; padding:12px 16px; min-height:110px; resize:vertical;
+      background:rgba(255,255,255,0.05); border:1px solid var(--border);
+      border-radius:10px; color:var(--text); font-family:'Inter',sans-serif;
+      font-size:0.93rem; transition:all 0.2s; outline:none;
+    }
+    textarea:focus { border-color:var(--primary); background:rgba(67,233,123,0.06); box-shadow:0 0 0 3px rgba(67,233,123,0.12); }
+    .form-actions { display:flex; gap:12px; margin-top:8px; }
+    .btn-cancel {
+      flex:1; padding:12px;
+      background:rgba(255,255,255,0.06); border:1px solid var(--border);
+      color:var(--text-muted); font-family:'Inter',sans-serif;
+      font-size:0.9rem; border-radius:12px; cursor:pointer;
+      transition:all 0.2s;
+    }
+    .btn-cancel:hover { border-color:var(--text-muted); color:var(--text); }
+    .btn-submit {
+      flex:2; padding:12px;
+      background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+      color:#0f0f1a; font-family:'Inter',sans-serif;
+      font-size:0.9rem; font-weight:700; border:none; border-radius:12px;
+      cursor:pointer; transition:all 0.25s;
+    }
+    .btn-submit:hover { box-shadow:0 6px 20px rgba(67,233,123,0.4); }
+
+    /* Leave List */
+    .section-title { font-size:1.1rem; font-weight:700; margin-bottom:16px; color:var(--text-muted); }
+    .section-title span { color:var(--text); }
+    .leave-card {
+      background:var(--card); border:1px solid var(--border);
+      border-radius:16px; padding:20px 24px;
+      margin-bottom:14px; transition:all 0.2s;
+      animation:fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+    .leave-card:hover { border-color:rgba(255,255,255,0.15); }
+    .leave-top { display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px; }
+    .leave-type { font-weight:700; font-size:1rem; }
+    .status-badge {
+      padding:4px 12px; border-radius:50px;
+      font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;
+    }
+    .status-badge.pending { background:rgba(247,201,72,0.15); color:var(--pending); border:1px solid rgba(247,201,72,0.3); }
+    .status-badge.approved { background:rgba(67,233,123,0.15); color:var(--approved); border:1px solid rgba(67,233,123,0.3); }
+    .status-badge.rejected { background:rgba(255,101,132,0.15); color:var(--rejected); border:1px solid rgba(255,101,132,0.3); }
+    .leave-meta { font-size:0.84rem; color:var(--text-muted); margin-top:8px; display:flex; flex-wrap:wrap; gap:16px; }
+    .leave-meta span { display:flex; align-items:center; gap:5px; }
+    .leave-reason { margin-top:12px; font-size:0.9rem; color:var(--text-muted); padding:10px 14px; background:rgba(255,255,255,0.03); border-radius:8px; border-left:3px solid var(--border); }
+    .hod-remark { margin-top:10px; font-size:0.85rem; padding:8px 14px; border-radius:8px; }
+    .hod-remark.approved { background:rgba(67,233,123,0.08); color:var(--approved); border-left:3px solid var(--approved); }
+    .hod-remark.rejected { background:rgba(255,101,132,0.08); color:var(--rejected); border-left:3px solid var(--rejected); }
+
+    .empty-state {
+      text-align:center; padding:60px 20px;
+      color:var(--text-muted);
+    }
+    .empty-state div { font-size:3rem; margin-bottom:12px; }
+
+    /* Toast */
+    .toast {
+      position:fixed; bottom:24px; right:24px; z-index:1000;
+      padding:14px 24px; border-radius:12px;
+      font-weight:700; font-size:0.9rem;
+      box-shadow:0 8px 30px rgba(0,0,0,0.4);
+      transform:translateY(80px); opacity:0;
+      transition:all 0.4s cubic-bezier(0.4,0,0.2,1);
+      display:flex; align-items:center; gap:8px;
+    }
+    .toast.show { transform:translateY(0); opacity:1; }
+    .toast.success { background:var(--primary); color:#0f0f1a; }
+    .toast.error { background:var(--rejected); color:#fff; }
+
+    /* ===== PROFILE COMPLETION SCREEN ===== */
+    #profileScreen {
+      display:none; position:relative; z-index:5;
+      min-height:100vh; flex-direction:column;
+    }
+    .profile-wrap {
+      flex:1; display:flex; align-items:flex-start; justify-content:center;
+      padding:40px 20px;
+    }
+    .profile-card {
+      background:var(--card); border:1px solid var(--border);
+      border-radius:24px; padding:40px 40px;
+      width:100%; max-width:600px;
+      box-shadow:0 20px 60px rgba(0,0,0,0.4);
+    }
+    .profile-card h2 { font-size:1.5rem; font-weight:800; margin-bottom:6px; }
+    .profile-card > p { color:var(--text-muted); font-size:0.88rem; margin-bottom:28px; }
+    .usn-display {
+      display:flex; align-items:center; gap:12px;
+      background:rgba(67,233,123,0.08); border:1px solid rgba(67,233,123,0.25);
+      border-radius:12px; padding:14px 18px; margin-bottom:28px;
+    }
+    .usn-display .usn-label { font-size:0.78rem; font-weight:700; color:var(--primary); text-transform:uppercase; letter-spacing:0.5px; }
+    .usn-display .usn-value { font-size:1.3rem; font-weight:800; color:var(--text); letter-spacing:1px; }
+    .usn-display .usn-lock { font-size:1.2rem; margin-left:auto; }
+    .pdiv { display:flex; gap:14px; }
+    .pdiv .form-group { flex:1; }
+    .pinput {
+      width:100%; padding:11px 14px;
+      background:rgba(255,255,255,0.05); border:1px solid var(--border);
+      border-radius:10px; color:var(--text); font-family:'Inter',sans-serif;
+      font-size:0.9rem; transition:all 0.2s; outline:none;
+      -webkit-appearance:none;
+    }
+    .pinput:focus { border-color:var(--primary); background:rgba(67,233,123,0.06); box-shadow:0 0 0 3px rgba(67,233,123,0.12); }
+    .pinput::placeholder { color:var(--text-muted); }
+    .pinput:read-only { opacity:0.6; cursor:not-allowed; }
+    .pselect { background:rgba(255,255,255,0.05); }
+    .pselect option { background:#1e1e35; }
+    .divider-label {
+      display:flex; align-items:center; gap:10px;
+      margin:22px 0 16px;
+    }
+    .divider-label::before, .divider-label::after { content:''; flex:1; height:1px; background:var(--border); }
+    .divider-label span { color:var(--text-muted); font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; white-space:nowrap; }
+    .profile-submit {
+      width:100%; padding:13px;
+      background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+      color:#0f0f1a; font-family:'Inter',sans-serif;
+      font-size:0.95rem; font-weight:700; border:none; border-radius:12px;
+      cursor:pointer; transition:all 0.25s; margin-top:8px;
+    }
+    .profile-submit:hover { transform:translateY(-2px); box-shadow:0 8px 25px rgba(67,233,123,0.4); }
+  </style>
+</head>
+<body>
+  <div class="bg-orbs">
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+  </div>
+
+  <!-- ===== PROFILE COMPLETION SCREEN ===== -->
+  <div id="profileScreen">
+    <header>
+      <a href="index.html" class="logo">🎓 EduLeave</a>
+      <div class="header-links"><a href="index.html">Home</a></div>
+    </header>
+    <div class="profile-wrap">
+      <div class="profile-card">
+        <span class="card-icon" style="display:block;text-align:center;font-size:2.5rem;margin-bottom:12px;">📋</span>
+        <h2 style="text-align:center;">Complete Your Profile</h2>
+        <p style="text-align:center;">Your account was created by admin. Please fill in your additional details to continue.</p>
+
+        <!-- USN pre-filled & locked -->
+        <div class="usn-display">
+          <div>
+            <div class="usn-label">Your USN (University Serial Number)</div>
+            <div class="usn-value" id="profileUSN">—</div>
+          </div>
+          <div class="usn-lock">🔒</div>
+        </div>
+
+        <form onsubmit="saveProfile(event)">
+
+          <div class="divider-label"><span>Personal Details</span></div>
+
+          <div class="pdiv">
+            <div class="form-group" style="margin-bottom:16px;">
+              <label>Date of Birth</label>
+              <input type="date" id="pdob" class="pinput" required />
+            </div>
+            <div class="form-group" style="margin-bottom:16px;">
+              <label>Blood Group</label>
+              <select id="pblood" class="pinput pselect" required>
+                <option value="">Select</option>
+                <option>A+</option><option>A-</option>
+                <option>B+</option><option>B-</option>
+                <option>O+</option><option>O-</option>
+                <option>AB+</option><option>AB-</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom:16px;">
+            <label>Full Address</label>
+            <textarea id="paddress" class="pinput" rows="2"
+              style="min-height:70px;resize:vertical;"
+              placeholder="House No., Street, City, State, PIN" required></textarea>
+          </div>
+
+          <div class="divider-label"><span>Guardian Details</span></div>
+
+          <div class="pdiv">
+            <div class="form-group" style="margin-bottom:16px;">
+              <label>Guardian Name</label>
+              <input type="text" id="pguardian" class="pinput" placeholder="Father / Mother / Guardian" required />
+            </div>
+            <div class="form-group" style="margin-bottom:16px;">
+              <label>Relation</label>
+              <select id="prelation" class="pinput pselect" required>
+                <option value="">Select</option>
+                <option>Father</option><option>Mother</option>
+                <option>Guardian</option><option>Sibling</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom:16px;">
+            <label>Guardian Phone</label>
+            <input type="tel" id="pguardianPhone" class="pinput" placeholder="10-digit number" maxlength="10" required />
+          </div>
+
+          <div class="divider-label"><span>Academic Info (Pre-filled by Admin)</span></div>
+
+          <div class="pdiv">
+            <div class="form-group" style="margin-bottom:16px;">
+              <label>Roll Number</label>
+              <input type="text" id="proll" class="pinput" readonly />
+            </div>
+            <div class="form-group" style="margin-bottom:16px;">
+              <label>Course</label>
+              <input type="text" id="pcourse" class="pinput" readonly />
+            </div>
+          </div>
+
+          <div class="pdiv">
+            <div class="form-group" style="margin-bottom:20px;">
+              <label>Year</label>
+              <input type="text" id="pyear" class="pinput" readonly />
+            </div>
+            <div class="form-group" style="margin-bottom:20px;">
+              <label>Section</label>
+              <input type="text" id="psection" class="pinput" readonly />
+            </div>
+          </div>
+
+          <button type="submit" class="profile-submit">Save Profile & Enter Portal →</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== LOGIN ===== -->
+  <div id="loginScreen">
+    <header>
+      <a href="index.html" class="logo">🎓 EduLeave</a>
+      <div class="header-links">
+        <a href="student-register.html">Register</a>
+        <a href="index.html">Home</a>
+      </div>
+    </header>
+    <div class="login-wrap">
+      <div class="login-card">
+        <span class="card-icon">🧑‍🎓</span>
+        <h2>Student Login</h2>
+        <p>Enter your credentials to access your portal</p>
+
+        <div class="error-banner" id="loginError">❌ Invalid Roll Number or Password. Contact your admin (index.jsp).</div>
+
+        <div style="background:rgba(108,99,255,0.08);border:1px solid rgba(108,99,255,0.25);border-radius:10px;padding:11px 14px;margin-bottom:18px;font-size:0.83rem;color:#9090b0;line-height:1.5;">
+          🔑 Only students <strong style="color:#a09fff">added by admin via index.jsp</strong> can login here. Contact your teacher/HOD if you cannot login.
+        </div>
+
+        <form onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <label for="loginRoll">Roll Number</label>
+            <input type="text" id="loginRoll" placeholder="e.g. CS2024001" required />
+          </div>
+          <div class="form-group">
+            <label for="loginPw">Password</label>
+            <div class="pw-wrap">
+              <input type="password" id="loginPw" placeholder="Your password" required />
+              <button type="button" class="toggle-pw" onclick="togglePw('loginPw')">👁</button>
+            </div>
+          </div>
+          <button type="submit" class="btn-primary">Login →</button>
+        </form>
+        <div class="register-link">
+          Not registered? Ask your <a href="../index.jsp" style="color:var(--primary);font-weight:700;">admin to add you via index.jsp →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== DASHBOARD ===== -->
+  <div id="dashboard">
+    <div class="dash-header">
+      <span class="dash-logo">🎓 EduLeave — Student Portal</span>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div class="user-chip">
+          <div class="avatar" id="avatarInitials">AY</div>
+          <span id="userName">Student</span>
+          <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="dash-body">
+      <div class="welcome-banner">
+        <div>
+          <h2>Welcome back, <span id="welcomeName">Student</span>! 👋</h2>
+          <p id="studentInfo">Roll: — | Course: — | Section: —</p>
+        </div>
+        <button class="apply-btn" onclick="toggleApplyPanel()">+ Apply for Leave</button>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-row" id="statsRow">
+        <div class="stat-card total"><div class="stat-num" id="statTotal">0</div><div class="stat-lbl">Total Applications</div></div>
+        <div class="stat-card pending"><div class="stat-num" id="statPending">0</div><div class="stat-lbl">Pending</div></div>
+        <div class="stat-card approved"><div class="stat-num" id="statApproved">0</div><div class="stat-lbl">Approved</div></div>
+        <div class="stat-card rejected"><div class="stat-num" id="statRejected">0</div><div class="stat-lbl">Rejected</div></div>
+      </div>
+
+      <!-- Apply Panel -->
+      <div id="applyPanel">
+        <h3>📝 New Leave Application</h3>
+        <form onsubmit="submitLeave(event)">
+          <div class="form-row" style="margin-bottom:20px;">
+            <div class="form-group" style="flex:1;margin:0;">
+              <label>Leave Type</label>
+              <select id="leaveType" required>
+                <option value="">Select Type</option>
+                <option>Medical Leave</option>
+                <option>Family Emergency</option>
+                <option>Personal Leave</option>
+                <option>Academic Event</option>
+                <option>Sports / Cultural</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="form-group" style="flex:1;margin:0;">
+              <label>From Date</label>
+              <input type="date" id="fromDate" required />
+            </div>
+            <div class="form-group" style="flex:1;margin:0;">
+              <label>To Date</label>
+              <input type="date" id="toDate" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Reason for Leave</label>
+            <textarea id="leaveReason" placeholder="Describe your reason clearly..." required></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn-cancel" onclick="toggleApplyPanel()">Cancel</button>
+            <button type="submit" class="btn-submit">Submit Application →</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab active" onclick="filterLeaves('all', this)">All</button>
+        <button class="tab" onclick="filterLeaves('pending', this)">Pending</button>
+        <button class="tab" onclick="filterLeaves('approved', this)">Approved</button>
+        <button class="tab" onclick="filterLeaves('rejected', this)">Rejected</button>
+      </div>
+
+      <div class="section-title">Your <span>Leave Applications</span></div>
+      <div id="leaveList"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    let currentStudent = null;
+    let currentFilter = 'all';
+
+    function getStudents() { return JSON.parse(localStorage.getItem('eduLeave_students') || '[]'); }
+    function getLeaves()   { return JSON.parse(localStorage.getItem('eduLeave_leaves') || '[]'); }
+    function saveLeaves(arr) { localStorage.setItem('eduLeave_leaves', JSON.stringify(arr)); }
+
+    function togglePw(id) {
+      const inp = document.getElementById(id);
+      inp.type = inp.type === 'password' ? 'text' : 'password';
+    }
+
+    const API_BASE = 'http://localhost:8080/student/api';
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const roll = document.getElementById('loginRoll').value.trim().toUpperCase();
+      const pw   = document.getElementById('loginPw').value;
+      const errBanner = document.getElementById('loginError');
+      errBanner.classList.remove('show');
+
+      // 1️⃣ Try MySQL via Tomcat API
+      try {
+        const res = await fetch(`${API_BASE}?action=verify&roll=${encodeURIComponent(roll)}&password=${encodeURIComponent(pw)}`);
+        if (res.ok) {
+          const student = await res.json();
+          if (!student.error) {
+            // Save/update in localStorage so leave data persists
+            const students = getStudents();
+            const idx = students.findIndex(s => s.rollNo === student.rollNo);
+            if (idx >= 0) {
+              // Keep profileComplete and extra fields if already filled
+              student.profileComplete = students[idx].profileComplete || false;
+              Object.assign(students[idx], student);
+            } else {
+              student.profileComplete = false;
+              students.push(student);
+            }
+            localStorage.setItem('eduLeave_students', JSON.stringify(students));
+            currentStudent = student;
+            showDashboard();
+            return;
+          }
+        }
+      } catch (err) {
+        console.warn('Tomcat API unreachable, trying localStorage fallback:', err);
+      }
+
+      // 2️⃣ Fallback: check localStorage (works when Tomcat is offline or student registered via student-register.html)
+      const students = getStudents();
+      const found = students.find(s => s.rollNo === roll && s.password === pw);
+      if (found) {
+        currentStudent = found;
+        showDashboard();
+        return;
+      }
+
+      // 3️⃣ Not found anywhere
+      errBanner.classList.add('show');
+    }
+
+    function showDashboard() {
+      // Check if profile is complete
+      if (!currentStudent.profileComplete) {
+        // Show profile completion screen instead
+        document.getElementById('loginScreen').style.display = 'none';
+        const ps = document.getElementById('profileScreen');
+        ps.style.display = 'flex';
+        // Pre-fill read-only fields
+        document.getElementById('profileUSN').textContent    = currentStudent.usn || 'N/A';
+        document.getElementById('proll').value    = currentStudent.rollNo || '';
+        document.getElementById('pcourse').value  = currentStudent.course || '';
+        document.getElementById('pyear').value    = currentStudent.year || '';
+        document.getElementById('psection').value = currentStudent.section || '';
+        return;
+      }
+
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+
+      const initials = (currentStudent.firstName[0] + currentStudent.lastName[0]).toUpperCase();
+      document.getElementById('avatarInitials').textContent = initials;
+      document.getElementById('userName').textContent = currentStudent.name;
+      document.getElementById('welcomeName').textContent = currentStudent.firstName;
+      document.getElementById('studentInfo').textContent =
+        `USN: ${currentStudent.usn||'—'} | Roll: ${currentStudent.rollNo} | ${currentStudent.course} | ${currentStudent.year} | Sec: ${currentStudent.section}`;
+
+      // Set min date for leave form
+      document.getElementById('fromDate').min = new Date().toISOString().split('T')[0];
+      document.getElementById('toDate').min = new Date().toISOString().split('T')[0];
+
+      renderLeaves();
+    }
+
+    function saveProfile(e) {
+      e.preventDefault();
+      const dob          = document.getElementById('pdob').value;
+      const blood        = document.getElementById('pblood').value;
+      const address      = document.getElementById('paddress').value.trim();
+      const guardian     = document.getElementById('pguardian').value.trim();
+      const relation     = document.getElementById('prelation').value;
+      const guardianPhone= document.getElementById('pguardianPhone').value.trim();
+
+      // Update student in localStorage
+      const students = getStudents();
+      const idx = students.findIndex(s => s.id === currentStudent.id);
+      if (idx !== -1) {
+        students[idx] = {
+          ...students[idx],
+          dob, blood, address, guardian, relation, guardianPhone,
+          profileComplete: true
+        };
+        localStorage.setItem('eduLeave_students', JSON.stringify(students));
+        currentStudent = students[idx];
+      }
+
+      document.getElementById('profileScreen').style.display = 'none';
+      showDashboard();
+      showToast('✅ Profile saved! Welcome to EduLeave.', 'success');
+    }
+
+    function logout() {
+      currentStudent = null;
+      document.getElementById('loginScreen').style.display = '';
+      document.getElementById('dashboard').style.display = 'none';
+      document.getElementById('loginRoll').value = '';
+      document.getElementById('loginPw').value = '';
+      document.getElementById('loginError').classList.remove('show');
+    }
+
+    function toggleApplyPanel() {
+      const panel = document.getElementById('applyPanel');
+      panel.classList.toggle('show');
+    }
+
+    function submitLeave(e) {
+      e.preventDefault();
+      const type   = document.getElementById('leaveType').value;
+      const from   = document.getElementById('fromDate').value;
+      const to     = document.getElementById('toDate').value;
+      const reason = document.getElementById('leaveReason').value.trim();
+
+      if (new Date(to) < new Date(from)) {
+        showToast('❌ "To Date" must be after "From Date"', 'error');
+        return;
+      }
+
+      const days = Math.ceil((new Date(to) - new Date(from)) / 86400000) + 1;
+      const newLeave = {
+        id: Date.now().toString(),
+        studentId: currentStudent.id,
+        studentName: currentStudent.name,
+        rollNo: currentStudent.rollNo,
+        course: currentStudent.course,
+        year: currentStudent.year,
+        section: currentStudent.section,
+        email: currentStudent.email,
+        type, from, to, days, reason,
+        status: 'pending',
+        appliedAt: new Date().toISOString(),
+        hodRemark: ''
+      };
+
+      const leaves = getLeaves();
+      leaves.push(newLeave);
+      saveLeaves(leaves);
+
+      document.getElementById('applyPanel').classList.remove('show');
+      e.target.reset();
+      showToast('✅ Leave application submitted successfully!', 'success');
+      renderLeaves();
+    }
+
+    function filterLeaves(filter, btn) {
+      currentFilter = filter;
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      renderLeaves();
+    }
+
+    function renderLeaves() {
+      const all = getLeaves().filter(l => l.studentId === currentStudent.id);
+      const filtered = currentFilter === 'all' ? all : all.filter(l => l.status === currentFilter);
+
+      // Update stats
+      document.getElementById('statTotal').textContent    = all.length;
+      document.getElementById('statPending').textContent  = all.filter(l => l.status === 'pending').length;
+      document.getElementById('statApproved').textContent = all.filter(l => l.status === 'approved').length;
+      document.getElementById('statRejected').textContent = all.filter(l => l.status === 'rejected').length;
+
+      const list = document.getElementById('leaveList');
+      if (!filtered.length) {
+        list.innerHTML = `<div class="empty-state"><div>📋</div>No leave applications found.</div>`;
+        return;
+      }
+
+      list.innerHTML = filtered.reverse().map(l => `
+        <div class="leave-card">
+          <div class="leave-top">
+            <span class="leave-type">📄 ${l.type}</span>
+            <span class="status-badge ${l.status}">${l.status.charAt(0).toUpperCase()+l.status.slice(1)}</span>
+          </div>
+          <div class="leave-meta">
+            <span>📅 ${formatDate(l.from)} → ${formatDate(l.to)}</span>
+            <span>🗓 ${l.days} day(s)</span>
+            <span>🕒 Applied: ${formatDate(l.appliedAt)}</span>
+          </div>
+          <div class="leave-reason">💬 ${l.reason}</div>
+          ${l.hodRemark ? `<div class="hod-remark ${l.status}">👤 HOD: ${l.hodRemark}</div>` : ''}
+        </div>
+      `).join('');
+    }
+
+    function formatDate(d) {
+      if (!d) return '—';
+      const dt = new Date(d);
+      return dt.toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
+    }
+
+    function showToast(msg, type = 'success') {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = `toast ${type} show`;
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    // Auto-login if session saved
+    const saved = localStorage.getItem('eduLeave_currentStudent');
+    if (saved) {
+      currentStudent = JSON.parse(saved);
+      showDashboard();
+    }
+  </script>
+</body>
+</html>

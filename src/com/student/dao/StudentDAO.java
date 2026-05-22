@@ -8,7 +8,7 @@ import java.util.List;
 public class StudentDAO {
     private String jdbcURL      = "jdbc:mysql://localhost:3306/studentdb";
     private String jdbcUsername = "root";
-    private String jdbcPassword = "ayush";
+    private String jdbcPassword = "password";
 
     private static final String INSERT_STUDENT_SQL =
         "INSERT INTO students (name, first_name, last_name, email, roll_no, usn, course, year, section, phone, password) " +

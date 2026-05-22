@@ -8,7 +8,7 @@ echo ============================================
 echo.
 
 :: ---- CONFIG ----
-set "JAVA_HOME=C:\Program Files\Java\jdk-17.0.18"
+set JAVA_HOME=C:\Program Files\Eclipse Adoptium\jdk-17.0.15.6-hotspot
 set "CATALINA_HOME=%~dp0apache-tomcat-10.1.30"
 set "PROJECT_DIR=%~dp0"
 set "SRC_DIR=%PROJECT_DIR%src"
